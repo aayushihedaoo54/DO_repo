@@ -1,19 +1,3 @@
-# require 'rails_helper'
-
-# RSpec.describe Job, type: :model do
-#   it "is valid with valid attributes" do
-#     job = build(:job)
-#     expect(job).to be_valid
-#   end
-
-#   it "trabnsition to running" do
-#     job = create(:job)
-#     job.start!
-#     expect(job.status).to eq("running")
-#   end
-  
-# end
-
 require 'rails_helper'
 
 RSpec.describe Job, type: :model do
