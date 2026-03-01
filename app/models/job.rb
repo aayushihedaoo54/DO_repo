@@ -13,7 +13,7 @@ class Job < ApplicationRecord
         update!(status: "running", started_at: Time.current)
     end
 
-    def completed!
+    def complete!
         update!(status: "completed", completed_at: Time.current)
     end
 

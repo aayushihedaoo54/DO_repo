@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_28_185732) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_01_191404) do
   create_table "clients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "client_id"
     t.integer "concurrency_limit"
@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_185732) do
     t.integer "priority"
     t.integer "retry_count"
     t.datetime "scheduled_at"
+    t.datetime "started_at"
     t.string "status"
     t.datetime "updated_at", null: false
     t.index ["client_id", "status"], name: "index_jobs_on_client_id_and_status"

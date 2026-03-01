@@ -6,6 +6,7 @@ class CreateJobs < ActiveRecord::Migration[8.1]
       t.string :status
       t.integer :retry_count
       t.datetime :scheduled_at
+      t.datetime :started_at
       t.datetime :completed_at
 
       t.timestamps
