@@ -1,21 +1,3 @@
-# require 'rails_helper'
-
-# RSpec.describe "Jobs API", type: :request do
-#   # describe "GET /index" do
-#   #   pending "add some examples (or delete) #{__FILE__}"
-#   # end
-
-#   it "creates job" do 
-#     post "/jobs", params: {
-#       client_id: "client_1",
-#       priority: "high"
-#     }
-
-#     expect(response).to have_http_status(200)
-#     expect(JSON.parse(response.body)["status"]).to eq("queued")
-#   end
-# end
-
 require 'rails_helper'
 
 RSpec.describe "Jobs API", type: :request do

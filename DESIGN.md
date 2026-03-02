@@ -1,10 +1,8 @@
-# DESIGN.md
+#design.md 
 
-## Distributed Task Orchestrator -- Architectural Design
+1.Scaling to 100k Jobs/Hour
 
-------------------------------------------------------------------------
 
-# 1️⃣ Scaling to 100k Jobs/Hour
 
 Target throughput: \~100,000 jobs/hour (\~28 jobs/second sustained).
 
@@ -13,25 +11,22 @@ fairness, consistency, and quota guarantees.
 
 ------------------------------------------------------------------------
 
-## Mitigating Redis Contention
-
 Redis is used for: - Concurrency counters - Heartbeats - Lightweight
 coordination
 
-### Strategy
+#strategy
 
-1.  Use isolated per-client keys (avoid hot global keys)
-2.  Only use O(1) operations like INCR/DECR
-3.  Avoid heavy distributed locks
-4.  Use connection pooling (Sidekiq-managed)
-5.  Deploy Redis Cluster in production
+
+1.Use isolated per-client keys (avoid hot global keys)
+2.Only use O(1) operations like INCR/DECR
+3.Avoid heavy distributed locks
+4.Use connection pooling (Sidekiq-managed)
+5.Deploy Redis Cluster in production
 
 Redis is treated as a coordination/cache layer --- not the source of
 truth.
 
 ------------------------------------------------------------------------
-
-## Sharding Strategy
 
 Shard by client_id using hash partitioning:
 
@@ -43,8 +38,6 @@ Prevents hot key concentration and client starvation.
 
 ------------------------------------------------------------------------
 
-## Scheduler vs Executor Separation
-
 Architecture:
 
 Client → API → Database ↓ Scheduler ↓ Sidekiq ↓ Executors
@@ -53,10 +46,9 @@ Benefits: - Independent scaling - Fault isolation - Better
 observability - Backpressure control
 
 ------------------------------------------------------------------------
+2.Failure Mode
 
-# 2️⃣ Failure Modes
-
-## Redis FLUSHALL
+#redis fall
 
 If Redis loses all keys:
 
@@ -70,7 +62,7 @@ System remains consistent because job state lives in MySQL.
 
 ------------------------------------------------------------------------
 
-## Split-Brain (Two Workers Stall Same Job)
+#two worker stall same job
 
 Use atomic DB transition:
 
@@ -82,7 +74,7 @@ Prevents duplicate state transitions.
 
 ------------------------------------------------------------------------
 
-## Frozen Worker (Long GC Pause)
+#frozen worker
 
 If no heartbeat for 60 seconds: → Job marked stalled
 
@@ -90,8 +82,7 @@ System provides At-Least-Once execution. Idempotent job logic ensures
 safe retries.
 
 ------------------------------------------------------------------------
-
-# 3️⃣ Retry Semantics
+3.Retry semantics
 
 Exponential backoff:
 
@@ -103,30 +94,29 @@ enforced - No bypass of quota
 Processing Model: At-Least-Once with idempotency.
 
 ------------------------------------------------------------------------
-
-# 4️⃣ Abuse Protection
+4.Abuse Protection
 
 If client submits 1M jobs in 10 seconds:
 
-### API Layer Protection
+#API Protection
 
--   Rate limiting per client
--   Token bucket (Redis)
--   Return HTTP 429 when exceeded
+  Rate limiting per client
+  Token bucket (Redis)
+  Return HTTP 429 when exceeded
 
-### Scheduler Fairness
+#Scheduler Fairness
 
--   Weighted Fair Queuing
--   Round-robin across client_ids
+ Weighted Fair Queuing
+ Round-robin across client_ids
 
-### Backpressure
+#Backpressure
 
--   Reject jobs when queue depth exceeds threshold
--   Return "System Busy"
+ Reject jobs when queue depth exceeds threshold
+ Return "System Busy"
 
 ------------------------------------------------------------------------
 
-# 5️⃣ Database Protection
+5.Dataabase Protection
 
 Use indexed queries and SKIP LOCKED:
 
@@ -136,8 +126,7 @@ SELECT \* FROM jobs WHERE status = 'queued' FOR UPDATE SKIP LOCKED LIMIT
 Prevents scheduler collisions.
 
 ------------------------------------------------------------------------
-
-# 6️⃣ Observability
+6.Observability
 
 Health endpoint returns 503 if: - DB unavailable - Redis unavailable -
 Sidekiq latency \> 15 seconds
@@ -145,8 +134,7 @@ Sidekiq latency \> 15 seconds
 Supports Kubernetes liveness and alerting.
 
 ------------------------------------------------------------------------
-
-# 7️⃣ Consistency Model
+7.Model Consistency
 
 Source of truth: MySQL
 
@@ -158,7 +146,8 @@ scalability
 
 ------------------------------------------------------------------------
 
-# Final Design Philosophy
+
+#Final Design 
 
 The orchestrator separates: - State (MySQL) - Coordination (Redis) -
 Execution (Sidekiq) - Scheduling (Dedicated worker)
