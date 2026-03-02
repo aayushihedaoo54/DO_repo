@@ -23,7 +23,7 @@ RSpec.describe "Jobs API", type: :request do
     post "/jobs", params: {
       client_id: "client_1",
       priority: "high",
-      workload: "task_1"
+      workload: "task_123"
     }
 
     expect(response).to have_http_status(:ok)

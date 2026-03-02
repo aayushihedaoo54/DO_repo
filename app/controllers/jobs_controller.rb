@@ -3,6 +3,7 @@ class JobsController < ApplicationController
         job = Job.create!(
             client_id: params[:client_id],
             priority: map_priority(params[:priority]),
+            workload: params[:workload],
             status: "queued",
             scheduled_at: Time.current
         )
